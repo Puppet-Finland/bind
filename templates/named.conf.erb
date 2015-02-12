@@ -1,0 +1,95 @@
+// Internals & VPN 
+acl "trusted" { ::1; 127.0.0.1; <%= allow_address_ipv4 %>; };
+
+options {
+    listen-on port 53 { 127.0.0.1; <%= listen %>; };
+    listen-on-v6 port 53 { ::1; };
+    directory 	"/var/named";
+    dump-file 	"/var/named/data/cache_dump.db";
+    statistics-file "/var/named/data/named_stats.txt";
+    memstatistics-file "/var/named/data/named_mem_stats.txt";
+    zone-statistics yes;
+
+    // Prevent DoS attacks by generating bogus zone transfer
+    // requests.  This will result in slower updates to the
+    // slave servers (e.g. they will await the poll interval
+    // before checking for updates).
+    notify no;
+
+    // Generate more efficient zone transfers.  This will place
+    // multiple DNS records in a DNS message, instead of one per
+    // DNS message.
+    transfer-format many-answers;   
+	
+    // Set the maximum zone transfer time to something more
+    // reasonable.  In this case, we state that any zone transfer
+    // that takes longer than 60 minutes is unlikely to ever
+    // complete.  WARNING:  If you have very large zone files,
+    // adjust this to fit your requirements.
+    max-transfer-time-in 60;
+
+    // Accept queries from our "trusted" ACL.  We will
+    // allow anyone to query our master zones below.
+    // This prevents us from becoming a free DNS server
+    // to the masses. 
+    allow-query {
+        trusted; 
+    };
+
+    // Accept queries of our cache from our "trusted" ACL. 
+    allow-query-cache {
+        trusted;
+    }; 
+
+    recursion yes;
+    allow-recursion { trusted; };
+
+    # fake responses to the version queries
+    version "13";
+
+    forwarders { <%= forwarders %>; };
+
+    /* Path to ISC DLV key */
+    bindkeys-file "/etc/named.iscdlv.key";
+    managed-keys-directory "/var/named/dynamic";
+
+}; //options
+
+logging {
+
+    channel default_syslog {
+        // Send most of the named messages to syslog.
+        syslog local2;
+        severity debug; 
+    };
+
+    channel audit_log {
+        // Send the security related messages to a separate file.
+        file "/var/named/log/audit.log";
+        severity debug;
+        print-time yes; 
+    };
+
+    category default { default_syslog; };
+    category general { default_syslog; };
+    category security { audit_log; default_syslog; };
+    category config { default_syslog; };
+    category resolver { audit_log; };
+    category xfer-in { audit_log; };
+    category xfer-out { audit_log; };
+    category notify { audit_log; };
+    category client { audit_log; };
+    category network { audit_log; };
+    category update { audit_log; };
+    category queries { audit_log; };
+    category lame-servers { audit_log; }; 
+
+}; //logging
+
+zone "<%= defaultdomain %>" {
+    type master;
+    allow-query {
+    trusted;
+    };
+    file "/var/named/data/<%= defaultdomain %>";
+};
