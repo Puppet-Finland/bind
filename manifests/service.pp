@@ -6,9 +6,9 @@
 class bind::service inherits bind::params {
 
     service { 'bind':
-        name => $::bind::params::service_name,
-        enable => true,
-        ensure => running,   
+        ensure  => running,
+        name    => $::bind::params::service_name,
+        enable  => true,
         require => Class['bind::install'],
     }
 }

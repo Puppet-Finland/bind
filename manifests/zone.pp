@@ -15,16 +15,16 @@ define bind::zone
 )
 {
   
-  include os::params
+  include ::os::params
 
-  file { "bind-zone-$domainname":
-    name =>  "/var/named/chroot/var/named/data/$domainname",
-    ensure => present,
-    source => "puppet:///files/bind-zone-$domainname",
-    owner => root,
-    group => "${::os::params::admingroup}",
-    mode => 644,
+  file { "bind-zone-${domainname}":
+    ensure  => present,
+    name    =>  "/var/named/chroot/var/named/data/${domainname}",
+    source  => "puppet:///files/bind-zone-${domainname}",
+    owner   => $::os::params::adminuser,
+    group   => $::os::params::admingroup,
+    mode    => '0644',
     require => File['/var/named/chroot/var/named/data'],
-    notify => Class['bind::service'],
+    notify  => Class['bind::service'],
   }
 }

@@ -3,7 +3,7 @@
 #
 # Setup named.conf
 #
-class bind::config 
+class bind::config
 (
   $listen,
   $defaultdomain,
@@ -13,34 +13,34 @@ class bind::config
 
 ) inherits bind::params
 {
-    include os::params
+    include ::os::params
     
     # convention: modulename-filename
     file { 'bind-named.conf':
-      name => $::bind::params::config_name,
-      content => template('bind/named.conf.erb'),
-      ensure => present,
-      owner => root,
-      group => $::os::params::admingroup,
-      mode => 755,
-      require => Class['bind::install'],
-      notify => Class['bind::service'],
+        ensure  => present,
+        name    => $::bind::params::config_name,
+        content => template('bind/named.conf.erb'),
+        owner   => $::os::params::adminuser,
+        group   => $::os::params::admingroup,
+        mode    => '0755',
+        require => Class['bind::install'],
+        notify  => Class['bind::service'],
     }
     
     # convention: modulename-filename
     file { [ '/var/named/chroot',
-             '/var/named/chroot/var',
-             '/var/named/chroot/var/named',
-             '/var/named/chroot/var/named/data' ]:
-      ensure => directory,
-      owner => root,
-      group => $::os::params::admingroup,
-      mode => 755,
-      require => Class['bind::install'],
+            '/var/named/chroot/var',
+            '/var/named/chroot/var/named',
+            '/var/named/chroot/var/named/data' ]:
+        ensure  => directory,
+        owner   => $::os::params::adminuser,
+        group   => $::os::params::admingroup,
+        mode    => '0755',
+        require => Class['bind::install'],
     }
     
-    bind::zone { "bind-$defaultdomain":
-      domainname => $defaultdomain,
+    bind::zone { "bind-${defaultdomain}":
+        domainname => $defaultdomain,
     }
 }
   

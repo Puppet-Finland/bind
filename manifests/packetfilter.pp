@@ -12,21 +12,20 @@ class bind::packetfilter
 ) inherits bind::params
 {
 
-    firewall { "007 ipv4 accept bind":
-        provider => 'iptables',
-        chain => 'INPUT',
-        proto => 'udp',
-        action => 'accept',
-        source => $allow_address_ipv4,
-        dport => 53,
+    Firewall {
+        chain    => 'INPUT',
+        proto    => 'udp',
+        action   => 'accept',
+        dport    => 53,
     }
 
-    firewall { "007 ipv6 accept bind":
+    firewall { '007 ipv4 accept bind':
+        provider => 'iptables',
+        source   => $allow_address_ipv4,
+    }
+
+    firewall { '007 ipv6 accept bind':
         provider => 'ip6tables',
-        chain => 'INPUT',
-        proto => 'udp',
-        action => 'accept',
-        source => $allow_address_ipv6,
-        dport => 53,
+        source   => $allow_address_ipv6,
     }
 }

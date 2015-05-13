@@ -34,22 +34,22 @@ class bind
 {
 
   # Rationale for this is explained in init.pp of the sshd module
-  if hiera('manage_bind', 'true') != 'false' {
+  if hiera('manage_bind', true) != false {
     
-    include bind::install
+    include ::bind::install
     
-    class { 'bind::config':
-      listen => $listen,
-      forwarders => $forwarders,
-      defaultdomain => $defaultdomain,
+    class { '::bind::config':
+      listen             => $listen,
+      forwarders         => $forwarders,
+      defaultdomain      => $defaultdomain,
       allow_address_ipv4 => $allow_address_ipv4,
-      allow_address_ipv6 => $allow_address_ipv6,      
+      allow_address_ipv6 => $allow_address_ipv6,
     }
     
-    include bind::service
+    include ::bind::service
 
     if tagged('packetfilter') {
-        class { 'bind::packetfilter':
+        class { '::bind::packetfilter':
             allow_address_ipv4 => $allow_address_ipv4,
             allow_address_ipv6 => $allow_address_ipv6,
         }
