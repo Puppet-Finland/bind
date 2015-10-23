@@ -5,6 +5,14 @@
 #
 # == Parameters
 #
+# [*manage*]
+#   Whether to manage bind using Puppet or not. Valid values are true (default) 
+#   and false.
+# [*manage_config*]
+#   Same as above but applies to bind configuration only.
+# [*manage_packetfilter*]
+#   Manage bind packet filtering configuration. Valid values are true and false 
+#   (default).
 # [*listen*]
 #   The interface bind listens on. Defaults to '127.0.0.1'.
 # [*defaultdomain*]
@@ -23,6 +31,9 @@
 #
 class bind
 (
+  $manage = true,
+  $manage_config = true,
+  $manage_packetfilter = false,
   $listen = '127.0.0.1',
   $defaultdomain,
   $forwarders,
@@ -33,22 +44,22 @@ class bind
 ) inherits bind::params
 {
 
-  # Rationale for this is explained in init.pp of the sshd module
-  if hiera('manage_bind', true) != false {
+if $manage {
     
     include ::bind::install
-    
-    class { '::bind::config':
-      listen             => $listen,
-      forwarders         => $forwarders,
-      defaultdomain      => $defaultdomain,
-      allow_address_ipv4 => $allow_address_ipv4,
-      allow_address_ipv6 => $allow_address_ipv6,
+
+    if $manage_config {
+        class { '::bind::config':
+            listen             => $listen,
+            forwarders         => $forwarders,
+            defaultdomain      => $defaultdomain,
+            allow_address_ipv4 => $allow_address_ipv4,
+            allow_address_ipv6 => $allow_address_ipv6,
+        }
     }
-    
     include ::bind::service
 
-    if tagged('packetfilter') {
+    if $manage_packetfilter {
         class { '::bind::packetfilter':
             allow_address_ipv4 => $allow_address_ipv4,
             allow_address_ipv6 => $allow_address_ipv6,
