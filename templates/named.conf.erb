@@ -1,8 +1,8 @@
 // Internals & VPN 
-acl "trusted" { ::1; 127.0.0.1; <%= allow_address_ipv4 %>; };
+acl "trusted" { ::1; 127.0.0.1; <%= @allow_address_ipv4 %>; };
 
 options {
-    listen-on port 53 { 127.0.0.1; <%= listen %>; };
+    listen-on port 53 { 127.0.0.1; <%= @listen %>; };
     listen-on-v6 port 53 { ::1; };
     directory 	"/var/named";
     dump-file 	"/var/named/data/cache_dump.db";
@@ -47,7 +47,7 @@ options {
     # fake responses to the version queries
     version "13";
 
-    forwarders { <%= forwarders %>; };
+    <%= @forwarders_option %>
 
     /* Path to ISC DLV key */
     bindkeys-file "/etc/named.iscdlv.key";
@@ -86,10 +86,10 @@ logging {
 
 }; //logging
 
-zone "<%= defaultdomain %>" {
+zone "<%= @defaultdomain %>" {
     type master;
     allow-query {
     trusted;
     };
-    file "/var/named/data/<%= defaultdomain %>";
+    file "/var/named/data/<%= @defaultdomain %>";
 };

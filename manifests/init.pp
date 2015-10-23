@@ -16,9 +16,9 @@
 # [*listen*]
 #   The interface bind listens on. Defaults to '127.0.0.1'.
 # [*defaultdomain*]
-#   Default domain bind uses.
+#   Default domain bind uses. Defaults to 'local'.
 # [*forwarders*]
-#   DNS servers to use as forwarders.
+#   DNS servers to use as forwarders. Defaults to undef.
 # [*allow_address_ipv4*]
 #   IPv4 address/subnet from which to allow DNS queries. Defaults to 
 #   '127.0.0.1'.
@@ -35,8 +35,8 @@ class bind
   $manage_config = true,
   $manage_packetfilter = false,
   $listen = '127.0.0.1',
-  $defaultdomain,
-  $forwarders,
+  $defaultdomain = 'local',
+  $forwarders = undef,
   $allow_address_ipv4='127.0.0.1',
   $allow_address_ipv6='::1',
   $monitor_email = $::servermonitor

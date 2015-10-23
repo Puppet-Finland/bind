@@ -14,6 +14,13 @@ class bind::config
 ) inherits bind::params
 {
     include ::os::params
+
+    # Configure forwarders if they are defined
+    if $forwarders {
+        $forwarders_option = "forwarders { ${forwarders}; };"
+    else {
+        $forwarders_option = undef
+    fi
     
     # convention: modulename-filename
     file { 'bind-named.conf':
