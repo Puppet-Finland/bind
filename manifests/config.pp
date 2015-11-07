@@ -18,9 +18,9 @@ class bind::config
     # Configure forwarders if they are defined
     if $forwarders {
         $forwarders_option = "forwarders { ${forwarders}; };"
-    else {
+    } else {
         $forwarders_option = undef
-    fi
+    }
     
     # convention: modulename-filename
     file { 'bind-named.conf':
@@ -50,5 +50,3 @@ class bind::config
         domainname => $defaultdomain,
     }
 }
-  
-  
